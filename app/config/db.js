@@ -25,5 +25,6 @@ db.Sequelize = Sequelize;
 db.SequelizeInstance = sequelizeInstance;
 
 db.editoriales = require('../models/editariales')(sequelizeInstance, Sequelize);
+db.libros = require('../models/libros')(sequelizeInstance, Sequelize);
 
 module.exports = db;
