@@ -8,7 +8,7 @@ const sequelizeInstance = new Sequelize (process.env.DB, process.env.USER, proce
     dialect: process.env.dialect,
     port: process.env.MY_SQL_PORT,
     dialectOptions: {
-        connectTimedout: 10000,
+        connectTimeout: 10000,
     },
     operatorAliases: "false",
     pool: {
@@ -23,5 +23,7 @@ const db = {};
 
 db.Sequelize = Sequelize;
 db.SequelizeInstance = sequelizeInstance;
+
+db.editoriales = require('../models/editariales')(sequelizeInstance, Sequelize);
 
 module.exports = db;
