@@ -27,7 +27,7 @@ db.SequelizeInstance = sequelizeInstance;
 
 //modelos
 db.editoriales = require('../models/editoriales')(sequelizeInstance, Sequelize);
-db.libros = require('../models/libros')(sequelizeInstance, Sequelize);
+db.libros = require('../models/librosModel')(sequelizeInstance, Sequelize);
 db.Usuarios = require('../models/Usuario')(sequelizeInstance, Sequelize);
 db.Autores = require('../models/Autor')(sequelizeInstance, Sequelize);
 

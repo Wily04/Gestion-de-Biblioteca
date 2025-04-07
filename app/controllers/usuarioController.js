@@ -1,87 +1,54 @@
 'use strict';
-
+const db = require('../config/db');
+const Usuario = db.Usuarios;
 const bcrypt = require('bcrypt');
-const { Usuario } = require('../models');
-const { createToken } = require('../services/services');
-const { Op } = require('sequelize');
 
-async function registrarUsuario(req, res) {
-    try {
-        // Validación básica
-        if (!req.body.email || !req.body.contraseña) {
-            return res.status(400).json({ message: 'Email y contraseña son requeridos' });
-        }
-
-        // Encriptar contraseña
-        const hashedPassword = await bcrypt.hash(req.body.contraseña, 10);
-
-        // Crear usuario
-        const usuario = await Usuario.create({
-            nombre: req.body.nombre,
-            email: req.body.email,
-            contraseña: hashedPassword,
-            rol: req.body.rol || 'miembro', // Valor por defecto
-        });
-
-        // Omitir contraseña en la respuesta
-        const usuarioResponse = usuario.toJSON();
-        delete usuarioResponse.contraseña;
-
-        res.status(201).json({
-            message: 'Usuario registrado exitosamente',
-            usuario: usuarioResponse
-        });
-
-    } catch (error) {
-        console.error('Error al registrar usuario:', error);
-        res.status(500).json({
-            message: error.message || 'Ocurrió un error al registrar el usuario'
-        });
+function insertUsuario(req, res) {
+    // Validación básica
+    if (!req.body.email || !req.body.contraseña) {
+        return res.status(400).send({ message: 'Email y contraseña son requeridos' });
     }
+
+    bcrypt.hash(req.body.contraseña, 10)
+        .then(hashedPassword => {
+            return Usuario.create({
+                nombre: req.body.nombre,
+                email: req.body.email,
+                contraseña: hashedPassword,
+                rol: req.body.rol || 'miembro'
+            });
+        })
+        .then(usuario => {
+            const usuarioData = usuario.get({ plain: true });
+            delete usuarioData.contraseña;
+            res.status(201).send(usuarioData);
+        })
+        .catch(err => {
+            // Manejo específico para errores de duplicado
+            if (err.name === 'SequelizeUniqueConstraintError') {
+                return res.status(409).send({ message: 'El email ya está registrado' });
+            }
+            res.status(500).send({
+                message: err.message || 'Error al registrar el usuario'
+            });
+        });
 }
 
-async function iniciarSesion(req, res) {
-    try {
-        const { email, contraseña } = req.body;
-
-        // Buscar usuario por email
-        const usuario = await Usuario.findOne({
-            where: { email: { [Op.eq]: email } }
-        });
-
-        if (!usuario) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
+function getUsuarios(req, res) {
+    Usuario.findAll({
+        attributes: { exclude: ['contraseña'] }
+    })
+    .then(usuarios => {
+        if (!usuarios || usuarios.length === 0) {
+            return res.status(404).send({ message: 'No se encontraron usuarios' });
         }
-
-        // Verificar contraseña
-        const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
-
-        if (!contraseñaValida) {
-            return res.status(401).json({ message: 'Contraseña incorrecta' });
-        }
-
-        // Generar token
-        const token = createToken(usuario.usuario_id);
-
-        // Omitir contraseña en la respuesta
-        const usuarioResponse = usuario.toJSON();
-        delete usuarioResponse.contraseña;
-
-        res.status(200).json({
-            message: 'Inicio de sesión exitoso',
-            usuario: usuarioResponse,
-            token: token
+        res.status(200).send(usuarios);
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: err.message || 'Error al obtener los usuarios'
         });
-
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        res.status(500).json({
-            message: error.message || 'Ocurrió un error al iniciar sesión'
-        });
-    }
+    });
 }
 
-module.exports = {
-    registrarUsuario,
-    iniciarSesion
-};
+module.exports = { insertUsuario, getUsuarios };
