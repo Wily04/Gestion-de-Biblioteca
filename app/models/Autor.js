@@ -1,7 +1,10 @@
-import { DataTypes } from 'sequelize';
-import { SequelizeInstance } from '../config/db.js';
+'use strict';
 
-export const Autor = SequelizeInstance.define('Autor', {
+const { DataTypes } = require('sequelize');
+const { SequelizeInstance } = require('../config/db');
+
+module.exports = (sequelize) =>{
+ const Autor = sequelize.define('Autor', {
   autor_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -30,4 +33,9 @@ export const Autor = SequelizeInstance.define('Autor', {
   }
 }, {
   tableName: 'autores',
+  timestamps: false,
 });
+
+return Autor;
+
+};
