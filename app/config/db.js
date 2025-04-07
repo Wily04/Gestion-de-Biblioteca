@@ -24,7 +24,9 @@ const db = {};
 db.Sequelize = Sequelize;
 db.SequelizeInstance = sequelizeInstance;
 
-db.editoriales = require('../models/editariales')(sequelizeInstance, Sequelize);
+
+//modelos
+db.editoriales = require('../models/editoriales')(sequelizeInstance, Sequelize);
 db.libros = require('../models/libros')(sequelizeInstance, Sequelize);
 db.Usuarios = require('../models/Usuario')(sequelizeInstance, Sequelize);
 
