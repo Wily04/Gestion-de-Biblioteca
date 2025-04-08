@@ -2,6 +2,11 @@
 const db = require('../config/db');
 const Usuario = db.Usuarios;
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+// Importar el servicio de tokens (similar al ejemplo original)
+const service = require('../services/services');
 
 function insertUsuario(req, res) {
     // Validación básica
@@ -21,15 +26,64 @@ function insertUsuario(req, res) {
         .then(usuario => {
             const usuarioData = usuario.get({ plain: true });
             delete usuarioData.contraseña;
-            res.status(201).send(usuarioData);
+            
+            // Generar token al registrar (opcional)
+            const token = service.createToken(usuario.usuario_id);
+            
+            res.status(201).send({
+                ...usuarioData,
+                token: token // Token incluido en la respuesta
+            });
         })
         .catch(err => {
-            // Manejo específico para errores de duplicado
             if (err.name === 'SequelizeUniqueConstraintError') {
                 return res.status(409).send({ message: 'El email ya está registrado' });
             }
             res.status(500).send({
                 message: err.message || 'Error al registrar el usuario'
+            });
+        });
+}
+
+function loginUsuario(req, res) {
+    const { email, contraseña } = req.body;
+
+    if (!email || !contraseña) {
+        return res.status(400).send({ message: 'Email y contraseña son requeridos' });
+    }
+
+    Usuario.findOne({ where: { email: email } })
+        .then(usuario => {
+            if (!usuario) {
+                return res.status(404).send({ message: 'Usuario no encontrado' });
+            }
+
+            // Comparación de contraseña (versión mejorada)
+            bcrypt.compare(contraseña, usuario.contraseña)
+                .then(isMatch => {
+                    if (!isMatch) {
+                        return res.status(401).send({ message: 'Credenciales incorrectas' });
+                    }
+
+                    const usuarioData = usuario.get({ plain: true });
+                    delete usuarioData.contraseña;
+
+                    // Generar token JWT (como en el ejemplo original)
+                    const token = service.createToken(usuario.usuario_id);
+
+                    res.status(200).send({
+                        message: 'Inicio de sesión exitoso',
+                        usuario: usuarioData,
+                        token: token
+                    });
+                })
+                .catch(err => {
+                    res.status(500).send({ message: 'Error al verificar contraseña' });
+                });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || 'Error al iniciar sesión'
             });
         });
 }
@@ -51,4 +105,8 @@ function getUsuarios(req, res) {
     });
 }
 
-module.exports = { insertUsuario, getUsuarios };
+module.exports = { 
+    insertUsuario, 
+    getUsuarios,
+    loginUsuario // Exportar la nueva función de login
+};
