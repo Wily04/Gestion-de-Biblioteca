@@ -1,7 +1,6 @@
-const db = require('../config/db'); // Asegúrate que esta ruta es correcta
+const db = require('../config/db'); 
 const Libro = db.libros;
 
-// Insertar un nuevo libro
 function insertLibro(req, res) {
     console.log(req.body);
     Libro.create({
@@ -24,7 +23,6 @@ function insertLibro(req, res) {
         });
 }
 
-// Obtener todos los libros
 function getLibros(req, res) {
     Libro.findAll()
         .then(data => {
