@@ -1,47 +1,42 @@
-'use strict';
-const { timeStamp } = require('console');
-const { DatabaseSync } = require('node:sqlite');
-const {DataTypes}= require('sequelize');
+'use strict'
 
-module.exports=(sequelize)=>{
-    const attributes={
-        prestamo_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true
+const {DataTypes} =require('sequelize');
+
+
+module.exports = (sequelize) =>{
+    const attributes ={
+        prestamos_id:{
+            type:DataTypes.INTEGER,
+            primaryKey:true
         },
-        usuario_id: {
-            type: DataTypes.INTEGER
+        usuario_id:{
+            type:DataTypes.INTEGER, 
         },
-        libro_id: {
-            type: DataTypes.INTEGER
+        libro_id:{
+            type:DataTypes.INTEGER, 
         },
-        fecha_prestamo: {
-            type: DataTypes.DATE
+        fecha_prestamo:{
+            type:DataTypes.DATE
         },
-        fecha_vencimiento: {
-            type: DataTypes.DATE
+        fecha_vencimiento:{
+            type:DataTypes.DATE
         },
-        fecha_devolucion: {
-            type: DataTypes.DATE
+        fecha_devolucion:{
+            type:DataTypes.DATE
         },
-        estado: {
-            type: DataTypes.STRING        
+        estado:{
+            type:DataTypes.ENUM
         }
     };
-    const options={
-        defaultScope: {
-            attributes: {excludes: ['createdAt','updateAt']}
+    const options ={
+        defaultScope:{
+            attributes:{excludes: ['createdAt',
+                'updatedAt']}
         },
         scopes: {},
-        tableName: 'Prestamos',
-        timeStamp: 'false'
+        tableName:'prestamos',
+        timesStamps:'false'
     };
 
-    return sequelize.define('prestamo',attributes,options);
+    return sequelize.define('prestamos',attributes,options);
 };
-
-
-
-
-
-
