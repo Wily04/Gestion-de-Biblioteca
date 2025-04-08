@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Libros</title>
+    <link rel="stylesheet" href="src/libros.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Gestión de Libros</h1>
+      <a href="inicio.html" class="volver">← Volver al inicio</a>
+    </header>
+
+    <main>
+      <section class="formulario">
+        <h2>Registrar Nuevo Libro</h2>
+        <form id="formLibro">
+          <input type="text" placeholder="Título del libro" name="titulo" required />
+          <input type="text" placeholder="Autor" name="autor" required />
+          <input type="text" placeholder="Editorial" name="editorial" required />
+          <input type="text" placeholder="Género" name="genero" required />
+          <label>Fecha de publicación:</label>
+          <input type="date" name="fecha_publicacion" required />
+          <input type="number" placeholder="Copias disponibles" name="copias_disponibles" required min="0" />
+          <input type="number" placeholder="Copias totales" name="copias_totales" required min="1" />
+          <button type="submit">Registrar Libro</button>
+        </form>
+      </section>
+
+      <section class="lista-libros">
+        <h2>Lista de Libros</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Editorial</th>
+              <th>Género</th>
+              <th>Fecha de Publicación</th>
+              <th>Copias Disponibles</th>
+              <th>Copias Totales</th>
+            </tr>
+          </thead>
+          <tbody id="tablaLibros">
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

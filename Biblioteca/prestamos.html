@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Préstamos</title>
+    <link rel="stylesheet" href="src/prestamos.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Gestión de Préstamos</h1>
+      <a href="inicio.html" class="volver">← Volver al inicio</a>
+    </header>
+
+    <main>
+      <section class="formulario">
+        <h2>Registrar Nuevo Préstamo</h2>
+        <form id="formPrestamo">
+          <label for="usuario_id">ID de Usuario:</label>
+          <input type="number" name="usuario_id" required />
+          <label for="libro_id">ID de Libro:</label>
+          <input type="number" name="libro_id" required />
+          <label for="fecha_prestamo">Fecha de Préstamo:</label>
+          <input type="date" name="fecha_prestamo" required />
+          <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+          <input type="date" name="fecha_vencimiento" required />
+          <label for="estado">Estado:</label>
+          <select name="estado" required>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Devuelto">Devuelto</option>
+            <option value="Vencido">Vencido</option>
+          </select>
+          <button type="submit">Registrar Préstamo</button>
+        </form>
+      </section>
+
+      <section class="lista-prestamos">
+        <h2>Lista de Préstamos</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID Préstamo</th>
+              <th>ID Usuario</th>
+              <th>ID Libro</th>
+              <th>Fecha Préstamo</th>
+              <th>Fecha Vencimiento</th>
+              <th>Fecha Devolución</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tablaPrestamos">
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

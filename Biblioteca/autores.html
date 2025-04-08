@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Autores</title>
+    <link rel="stylesheet" href="src/autores.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Gestión de Autores</h1>
+      <a href="inicio.html" class="volver">← Volver al inicio</a>
+    </header>
+
+    <main>
+      <section class="formulario">
+        <h2>Registrar Nuevo Autor</h2>
+        <form id="formAutor">
+          <input type="text" placeholder="Nombre del autor" name="nombre" required />
+          <input type="text" placeholder="Nacionalidad" name="nacionalidad" required />
+          <label>Fecha de nacimiento:</label>
+          <input type="date" name="fecha_nacimiento" required />
+          <label>Fecha de fallecimiento (opcional):</label>
+          <input type="date" name="fecha_fallecimiento" />
+          <button type="submit">Registrar Autor</button>
+        </form>
+      </section>
+
+      <section class="lista-autores">
+        <h2>Lista de Autores</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Nacionalidad</th>
+              <th>Fecha Nacimiento</th>
+              <th>Fecha Fallecimiento</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAutores">
+            <!-- Aquí se agregarán los autores con JavaScript -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

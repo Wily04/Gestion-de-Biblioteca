@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Editoriales</title>
+    <link rel="stylesheet" href="src/editoriales.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Gestión de Editoriales</h1>
+      <a href="inicio.html" class="volver">← Volver al inicio</a>
+    </header>
+
+    <main>
+      <section class="formulario">
+        <h2>Registrar Nueva Editorial</h2>
+        <form id="formEditorial">
+          <input type="text" placeholder="Nombre de la editorial" name="nombre" required />
+          <input type="text" placeholder="Dirección" name="direccion" required />
+          <input type="text" placeholder="Teléfono" name="telefono" required />
+          <input type="email" placeholder="Correo electrónico" name="email" required />
+          <button type="submit">Registrar Editorial</button>
+        </form>
+      </section>
+
+      <section class="lista-editoriales">
+        <h2>Lista de Editoriales</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Correo Electrónico</th>
+            </tr>
+          </thead>
+          <tbody id="tablaEditoriales">
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
