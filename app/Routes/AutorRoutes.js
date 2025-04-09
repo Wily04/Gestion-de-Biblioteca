@@ -8,7 +8,7 @@ const apiRoutes = express.Router();
     .post('/insertAutor', async (req, res) => await AutorController.insertAutor(req, res)); */
 
 apiRoutes.get('/listarautores', AutorController.getAutor);
-apiRoutes.post('/insterarautores', AutorController.insertAutor);
+apiRoutes.post('/insertarautores', AutorController.insertAutor);
 apiRoutes.delete('/eliminarautores/:id', AutorController.eliminarAutor); 
 
 module.exports = apiRoutes;
