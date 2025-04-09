@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-          const response = await fetch('http://localhost:3300/api/autores/listarautores', {
+          const response = await fetch('http://localhost:3300/api/autores/insterarautores', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
