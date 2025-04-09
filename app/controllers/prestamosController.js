@@ -1,74 +1,42 @@
-const Prestamo =require('./models/prestamosModel');
+const db = require('../config/db');
+const Prestamos = db.prestamos;
 
-const obtenerPrestamos = async (req, res) => {
-    try {
-        const prestamos = await Prestamo.findAll();
-        res.json(prestamos);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
+function insertPrestamo(req, res) {
+    console.log(req.body);
+    Prestamos.create({
+        usuario_id: req.body['usuario_id'],
+        libro_id: req.body['libro_id'],
+        fecha_prestamo: new Date(),
+        fecha_vencimiento: req.body['fecha_vencimiento'],
+        fecha_devolucion: req.body['fecha_devolucion'] || null,
+        estado: req.body['estado'],
+        createdAt: new Date(),
+        updatedAt: new Date()
+    })
+        .then(data => {
+            res.status(200).send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || 'Sucedió un error inesperado'
+            });
+        });
+}
 
+async function getPrestamos(req, res) {
+    Prestamos.findAll()
+        .then(data => {
+            if (!data || data.length === 0) {
+                res.status(404).send({ message: 'No se encontraron préstamos' });
+            } else {
+                res.status(200).send(data);
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || 'Sucedió un error al obtener los préstamos'
+            });
+        });
+}
 
-const obtenerPrestamosPorID = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const prestamo = await Prestamo.findByPk(id);
-        if (!prestamo) {
-            return res.status(404).json({ message: 'Préstamo no encontrado' });
-        }
-        res.json(prestamo);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-
-const crearPrestamo = async (req, res) => {
-    const { nombre, monto, fecha } = req.body;
-    try {
-        const prestamo = await Prestamo.create({ nombre, monto, fecha });
-        res.status(201).json({ message: 'Préstamo creado exitosamente', id: prestamo.id });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-
-const actualizarPrestamo = async (req, res) => {
-    const { id } = req.params;
-    const { nombre, monto, fecha } = req.body;
-    try {
-        const prestamo = await Prestamo.findByPk(id);
-        if (!prestamo) {
-            return res.status(404).json({ message: 'Préstamo no encontrado' });
-        }
-        await prestamo.update({ nombre, monto, fecha });
-        res.json({ message: 'Préstamo actualizado exitosamente' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-
-const eliminarPrestamo = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const prestamo = await Prestamo.findByPk(id);
-        if (!prestamo) {
-            return res.status(404).json({ message: 'Préstamo no encontrado' });
-        }
-        await prestamo.destroy();
-        res.json({ message: 'Préstamo eliminado exitosamente' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-module.exports = {
-    obtenerPrestamos,
-    obtenerPrestamosPorID,
-    crearPrestamo,
-    actualizarPrestamo,
-    eliminarPrestamo
-};
+module.exports = { insertPrestamo, getPrestamos };

@@ -1,18 +1,11 @@
+'use strict'
+
 const express = require('express');
-const router = express.Router();
-const {
-    obtenerPrestamos,
-    obtenerPrestamosPorID,
-    crearPrestamo,
-    actualizarPrestamo,
-    eliminarPrestamo
-} = require('./prestamosController');
+const prestamoController = require('../controllers/prestamoController');
+const apiRoutes = express.Router();
 
+apiRoutes
+    .get('/getAllPrestamos', async (req, res) => await prestamoController.getPrestamos(req, res))
+    .post('/insertPrestamo', async (req, res) => await prestamoController.insertPrestamo(req, res));
 
-router.get('/prestamos', obtenerPrestamos);
-router.get('/prestamos/:id', obtenerPrestamosPorID);
-router.post('/prestamos', crearPrestamo);
-router.put('/prestamos/:id', actualizarPrestamo); 
-router.delete('/prestamos/:id', eliminarPrestamo); 
-
-module.exports = router;
+module.exports = apiRoutes;
