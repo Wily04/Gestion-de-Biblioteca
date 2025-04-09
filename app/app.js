@@ -3,7 +3,7 @@ const cors = require('cors');
 
 const App = express();
 
-const autorRoutes = require('./Routes/AutorRoutes');
+const autorRoutes = require('./Routes/autorRoutes');
 const usuarioRoutes = require('./Routes/usuarioRoutes');
 
 App.use(express.json());
