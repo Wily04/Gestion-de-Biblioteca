@@ -3,40 +3,45 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const Prestamo = sequelize.define('Prestamo', { 
-    prestamos_id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true 
-    },
-    usuario_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    libro_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    fecha_prestamo: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    fecha_vencimiento: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    fecha_devolucion: {
-      type: DataTypes.DATE,
-      allowNull: true // Puede ser nulo
-    },
-    estado: {
-      type: DataTypes.ENUM('pendiente', 'devuelto', 'vencido'), 
-      allowNull: false
-    }
-  }, {
-    tableName: 'prestamos', 
-    timestamps: false 
-  });
+    const attributes = {
+        prestamos_id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true //Asegura de que sea autoincremental
+        },
+        usuario_id: {
+            type: DataTypes.INTEGER, 
+            allowNull: false 
+        },
+        libro_id: {
+            type: DataTypes.INTEGER, 
+            allowNull: false
+        },
+        fecha_prestamo: {
+            type: DataTypes.DATE,
+            allowNull: false 
+        },
+        fecha_vencimiento: {
+            type: DataTypes.DATE,
+            allowNull: false 
+        },
+        fecha_devolucion: {
+            type: DataTypes.DATE
+        },
+        estado: {
+            type: DataTypes.ENUM('activo', 'finalizado', 'cancelado'), 
+            allowNull: false 
+        }
+    };
 
-  return Prestamo;
+    const options = {
+        defaultScope: {
+            attributes: { exclude: ['createdAt', 'updatedAt'] }
+        },
+        scopes: {},
+        tableName: 'Prestamos',
+        timestamps: false 
+    };
+
+    return sequelize.define('Prestamo', attributes, options);
 };
