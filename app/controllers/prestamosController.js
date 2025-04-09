@@ -1,6 +1,6 @@
 const { Prestamo } = require('../models/prestamosModel');
-const { Usuario } = require('../models/usuariosModel'); // Importa el modelo Usuario
-const { Libro } = require('../models/librosModel');   // Importa el modelo Libro
+const { Usuario } = require('../models/usuariosModel'); 
+const { Libro } = require('../models/librosModel');   
 
 const obtenerPrestamos = async (req, res) => {
     try {

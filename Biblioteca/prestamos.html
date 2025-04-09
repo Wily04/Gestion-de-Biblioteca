@@ -168,7 +168,6 @@
                 tablaPrestamosBody.innerHTML = '';
 
                 try {
-                    // **MODIFICACIÓN IMPORTANTE: Utiliza la nueva ruta "/mostrarprestamos"**
                     const response = await fetch('http://localhost:3300/api/prestamo/mostrarprestamos');
                     console.log('Response from list:', response);
 
@@ -189,7 +188,6 @@
                         const libroIdCell = row.insertCell();
                         libroIdCell.textContent = prestamo.libro_id;
 
-                        // **MODIFICACIÓN: Accede a las propiedades anidadas "libro" y "usuario"**
                         const tituloLibroCell = row.insertCell();
                         tituloLibroCell.textContent = prestamo.libro ? prestamo.libro.titulo : 'N/A';
 

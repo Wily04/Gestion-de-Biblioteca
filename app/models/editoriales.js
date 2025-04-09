@@ -49,7 +49,7 @@ module.exports = (sequelize) => {
         },
         scopes: {},
         tableName: 'editoriales',
-        timestamps: false, // No usar los campos createdAt y updatedAt
+        timestamps: false, 
     };
 
     return sequelize.define('editorial', attributes, options);

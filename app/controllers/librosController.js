@@ -4,7 +4,7 @@ const Libro = db.libros;
 function insertLibro(req, res) {
     console.log(req.body);
     Libro.create({
-        libro_id: req.body['libro_id'], // Asegúrate de cómo manejas el ID
+        libro_id: req.body['libro_id'], 
         titulo: req.body['titulo'],
         autor_id: req.body['autor_id'],
         editorial_id: req.body['editorial_id'],

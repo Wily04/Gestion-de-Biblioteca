@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express');
 const prestamoController = require('../controllers/prestamosController');
 const router = express.Router();
@@ -9,9 +11,9 @@ const {
 } = require('../controllers/prestamosController');
 
 
-router.get('/mostrarprestamos', obtenerPrestamos);
-router.post('/crearprestamos', crearPrestamo);
-router.put('/actualizarprestamos/:id', actualizarPrestamo); 
-router.delete('/borrarprestamos/:id', eliminarPrestamo); 
+router.get('/mostrarprestamos', prestamoController.obtenerPrestamos);
+router.post('/crearprestamos', prestamoController.crearPrestamo);
+router.put('/actualizarprestamos/:id', prestamoController.actualizarPrestamo); 
+router.delete('/borrarprestamos/:id', prestamoController.eliminarPrestamo); 
 
 module.exports = router;
