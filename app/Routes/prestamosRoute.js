@@ -3,7 +3,6 @@ const prestamoController = require('../controllers/prestamosController');
 const router = express.Router();
 const {
     obtenerPrestamos,
-    obtenerPrestamosPorID,
     crearPrestamo,
     actualizarPrestamo,
     eliminarPrestamo

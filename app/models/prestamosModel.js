@@ -3,7 +3,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-    const attributes = {
+    const Prestamos = {
         prestamos_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -43,5 +43,5 @@ module.exports = (sequelize) => {
         timestamps: false 
     };
 
-    return sequelize.define('Prestamo', attributes, options);
+    return sequelize.define('Prestamo', Prestamos, options);
 };
