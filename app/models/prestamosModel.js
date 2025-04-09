@@ -1,42 +1,42 @@
-'use strict'
+'use strict';
 
-const {DataTypes} =require('sequelize');
+const { DataTypes } = require('sequelize');
 
+module.exports = (sequelize) => {
+  const Prestamo = sequelize.define('Prestamo', { 
+    prestamos_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true 
+    },
+    usuario_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    libro_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    fecha_prestamo: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    fecha_vencimiento: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    fecha_devolucion: {
+      type: DataTypes.DATE,
+      allowNull: true // Puede ser nulo
+    },
+    estado: {
+      type: DataTypes.ENUM('pendiente', 'devuelto', 'vencido'), 
+      allowNull: false
+    }
+  }, {
+    tableName: 'prestamos', 
+    timestamps: false 
+  });
 
-module.exports = (sequelize) =>{
-    const attributes ={
-        prestamos_id:{
-            type:DataTypes.INTEGER,
-            primaryKey:true
-        },
-        usuario_id:{
-            type:DataTypes.INTEGER, 
-        },
-        libro_id:{
-            type:DataTypes.INTEGER, 
-        },
-        fecha_prestamo:{
-            type:DataTypes.DATE
-        },
-        fecha_vencimiento:{
-            type:DataTypes.DATE
-        },
-        fecha_devolucion:{
-            type:DataTypes.DATE
-        },
-        estado:{
-            type:DataTypes.ENUM
-        }
-    };
-    const options ={
-        defaultScope:{
-            attributes:{excludes: ['createdAt',
-                'updatedAt']}
-        },
-        scopes: {},
-        tableName:'prestamos',
-        timesStamps:'false'
-    };
-
-    return sequelize.define('prestamos',attributes,options);
+  return Prestamo;
 };
