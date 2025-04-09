@@ -1,4 +1,4 @@
-const Prestamo = require('../models/prestamosModel')(sequelize);
+const Prestamo = require('../models/prestamosModel');
 
 const obtenerPrestamos = async (req, res) => {
     try {

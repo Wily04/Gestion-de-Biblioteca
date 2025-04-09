@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
         prestamos_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true //Asegura de que sea autoincremental
+            autoIncrement: true 
         },
         usuario_id: {
             type: DataTypes.INTEGER, 
