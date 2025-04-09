@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-
 const App = express();
 
 const autorRoutes = require('./Routes/AutorRoutes');
