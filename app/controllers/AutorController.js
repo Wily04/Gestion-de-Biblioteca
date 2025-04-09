@@ -8,7 +8,7 @@ function insertAutor(req, res) {
         nombre: req.body['nombre'],
         nacionalidad: req.body['nacionalidad'],
         fecha_nacimiento: req.body['fch_nacimiento'],
-        fecha_fallecimieno: req.body['fch_fallecimiento'] || null,
+        fecha_fallecimiento: req.body['fch_fallecimiento'] || null,
         
     })
         .then(data => {
@@ -36,4 +36,21 @@ async function getAutor(req, res) {
         })
 }
 
-module.exports = { getAutor, insertAutor }
+const eliminarAutor = async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Si tu clave primaria no es "id", usa findOne con where
+        const autor = await Autor.findOne({ where: { autor_id: id } });
+
+        if (!autor) {
+            return res.status(404).json({ message: 'Autor no encontrado' });
+        }
+
+        await autor.destroy();
+        res.json({ message: 'Autor eliminado exitosamente' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { getAutor, insertAutor, eliminarAutor }
