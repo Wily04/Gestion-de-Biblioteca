@@ -100,8 +100,29 @@ function getUsuarios(req, res) {
   
 }
 
+function eliminarUsuario(req, res) {
+    const { id } = req.params;
+    Usuario.destroy({
+        where: {
+            usuario_id: id
+        }
+    })
+    .then(count => {
+        if (count > 0) {
+            res.status(200).send({ message: `Usuario con ID ${id} eliminado correctamente.` });
+        } else {
+            res.status(404).send({ message: `No se encontró ningún usuario con el ID ${id}.` });
+        }
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || `Error al eliminar el usuario con ID ${id}.` });
+    });
+}
+
+
 module.exports = { 
     insertUsuario, 
     getUsuarios,
-    loginUsuario  
+    loginUsuario,
+    eliminarUsuario  
 };

@@ -1,54 +1,190 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="src/css/usuarios.css" />
-  </head>
-  <body>
+</head>
+<body>
     <header>
-      <h1>Gestión de Usuarios</h1>
-      <a href="inicio.html" class="volver">← Volver al inicio</a>
+        <h1>Gestión de Usuarios</h1>
+        <a href="inicio.html" class="volver">← Volver al inicio</a>
     </header>
 
     <main>
-      <section class="formulario">
-        <h2>Registrar Nuevo Usuario</h2>
-        <form id="formUsuario">
-          <label for="nombre">Nombre:</label>
-          <input type="text" name="nombre" required />
-          <label for="email">Correo Electrónico:</label>
-          <input type="email" name="email" required />
-          <label for="contraseña">Contraseña:</label>
-          <input type="password" name="contraseña" required />
-          <label for="rol">Rol:</label>
-          <select name="rol" required>
-            <option value="admini">Administrador</option>
-            <option value="miembro">Miembro</option>
-          </select>
-          <button type="submit">Registrar Usuario</button>
-          <button class="actualizar">Actualizar</button>
-          <button class="eliminar">Eliminar</button>
-        </form>
-      </section>
+        <section class="formulario">
+            <h2>Registrar Nuevo Usuario</h2>
+            <form id="formUsuario">
+                <label for="nombre">Nombre:</label>
+                <input type="text" name="nombre" required />
+                <label for="email">Correo Electrónico:</label>
+                <input type="email" name="email" required />
+                <label for="contraseña">Contraseña:</label>
+                <input type="password" name="contraseña" required />
+                <label for="rol">Rol:</label>
+                <select name="rol" id="rol" required>
+                    <option value="">Seleccionar Rol</option>
+                    <option value="admini">Administrador</option>
+                    <option value="miembro">Miembro</option>
+                </select>
+                <button type="submit">Registrar Usuario</button>
+                <button class="actualizar">Actualizar</button>
+                <button class="eliminar">Eliminar</button>
+            </form>
+        </section>
 
-      <section class="lista-usuarios">
-        <h2>Lista de Usuarios</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID Usuario</th>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Fecha de Creación</th>
-            </tr>
-          </thead>
-          <tbody id="tablaUsuarios">
-          </tbody>
-        </table>
-      </section>
+        <section class="lista-usuarios">
+            <h2>Lista de Usuarios</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Usuario</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Fecha de Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaUsuarios">
+                </tbody>
+            </table>
+        </section>
     </main>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formUsuario = document.getElementById('formUsuario');
+            const tablaUsuariosBody = document.getElementById('tablaUsuarios');
+            const rolSelect = document.getElementById('rol');
+
+            if (formUsuario) {
+                formUsuario.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const nombreInput = formUsuario.querySelector('input[name="nombre"]');
+                    const emailInput = formUsuario.querySelector('input[name="email"]');
+                    const contraseñaInput = formUsuario.querySelector('input[name="contraseña"]');
+
+                    if (nombreInput && emailInput && contraseñaInput && rolSelect.value) {
+                        const nuevoUsuario = {
+                            nombre: nombreInput.value,
+                            email: emailInput.value,
+                            contraseña: contraseñaInput.value,
+                            rol: rolSelect.value,
+                        };
+
+                        try {
+                            const response = await fetch('http://localhost:3300/api/usuarios/insertarusuarios', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(nuevoUsuario),
+                            });
+
+                            console.log('Response from register:', response);
+
+                            if (response && response.ok) {
+                                const data = await response.json();
+                                console.log('Usuario registrado exitosamente:', data);
+                                alert('Usuario registrado exitosamente!');
+                                formUsuario.reset();
+                                fetchUsuarios();
+                            } else {
+                                const error = await response.json();
+                                console.error('Error al registrar el usuario:', error);
+                                alert('Error al registrar el usuario: ' + (error.message || ''));
+                            }
+                        } catch (error) {
+                            console.error('Error de red:', error);
+                            alert('Error de red al intentar registrar el usuario.');
+                        }
+                    } else {
+                        console.error('Por favor, completa todos los campos requeridos.');
+                        alert('Por favor, completa todos los campos requeridos.');
+                    }
+                });
+            } else {
+                console.error('No se encontró el formulario con el ID "formUsuario".');
+            }
+
+            async function fetchUsuarios() {
+                if (!tablaUsuariosBody) {
+                    console.error('No se encontró el elemento tbody con el ID "tablaUsuarios".');
+                    return;
+                }
+
+                tablaUsuariosBody.innerHTML = '';
+
+                try {
+                    const response = await fetch('http://localhost:3300/api/usuarios/listarusuarios');
+                    console.log('Response from list:', response);
+
+                    if (!response.ok) {
+                        const message = `Error al obtener usuarios: ${response.status}`;
+                        throw new Error(message);
+                    }
+                    const usuarios = await response.json();
+                    usuarios.forEach(usuario => {
+                        const row = tablaUsuariosBody.insertRow();
+
+                        const idCell = row.insertCell();
+                        idCell.textContent = usuario.usuario_id;
+
+                        const nombreCell = row.insertCell();
+                        nombreCell.textContent = usuario.nombre;
+
+                        const emailCell = row.insertCell();
+                        emailCell.textContent = usuario.email;
+
+                        const rolCell = row.insertCell();
+                        rolCell.textContent = usuario.rol;
+
+                        const fechaCreacionCell = row.insertCell();
+                        fechaCreacionCell.textContent = new Date(usuario.fecha_creacion).toLocaleDateString();
+
+                        const accionesCell = row.insertCell();
+                        const eliminarButton = document.createElement('button');
+                        eliminarButton.textContent = 'Eliminar';
+                        eliminarButton.classList.add('eliminar-btn');
+                        eliminarButton.dataset.usuarioId = usuario.usuario_id;
+                        eliminarButton.addEventListener('click', () => eliminarUsuario(usuario.usuario_id));
+                        accionesCell.appendChild(eliminarButton);
+                    });
+
+                } catch (error) {
+                    console.error('Error al cargar la lista de usuarios:', error);
+                    alert('Error al cargar la lista de usuarios.');
+                }
+            }
+
+            async function eliminarUsuario(id) {
+                if (confirm(`¿Estás seguro de que quieres eliminar el usuario con ID ${id}?`)) {
+                    try {
+                        const response = await fetch(`http://localhost:3300/api/usuarios/eliminarusuario/${id}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            console.log(`Usuario con ID ${id} eliminado exitosamente.`);
+                            alert(`Usuario con ID ${id} eliminado exitosamente.`);
+                            fetchUsuarios();
+                        } else {
+                            const error = await response.json();
+                            console.error(`Error al eliminar el usuario con ID ${id}:`, error);
+                            alert(`Error al eliminar el usuario con ID ${id}.`);
+                        }
+                    } catch (error) {
+                        console.error('Error de red al intentar eliminar el usuario:', error);
+                        alert('Error de red al intentar eliminar el usuario.');
+                    }
+                }
+            }
+
+            fetchUsuarios();
+        });
+    </script>
+</body>
 </html>

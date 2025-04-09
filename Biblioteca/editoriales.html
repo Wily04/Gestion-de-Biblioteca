@@ -1,49 +1,182 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Editoriales</title>
     <link rel="stylesheet" href="src/css/editoriales.css" />
-  </head>
-  <body>
+</head>
+<body>
     <header>
-      <h1>Gestión de Editoriales</h1>
-      <a href="inicio.html" class="volver">← Volver al inicio</a>
+        <h1>Gestión de Editoriales</h1>
+        <a href="inicio.html" class="volver">← Volver al inicio</a>
     </header>
 
     <main>
-      <section class="formulario">
-        <h2>Registrar Nueva Editorial</h2>
-        <form id="formEditorial">
-          <input type="text" placeholder="Nombre de la editorial" name="nombre" required />
-          <input type="text" placeholder="Dirección" name="direccion" required />
-          <input type="text" placeholder="Teléfono" name="telefono" required />
-          <input type="email" placeholder="Correo electrónico" name="email" required />
-          <button type="submit">Registrar Editorial</button>
-          <button class="actualizar">Actualizar</button>
-          <button class="eliminar">Eliminar</button>
-        </form>
-      </section>
+        <section class="formulario">
+            <h2>Registrar Nueva Editorial</h2>
+            <form id="formEditorial">
+                <input type="text" placeholder="Nombre de la editorial" name="nombre" required />
+                <input type="text" placeholder="Dirección" name="direccion" required />
+                <input type="text" placeholder="Teléfono" name="telefono" required />
+                <input type="email" placeholder="Correo electrónico" name="email" required />
+                <button type="submit">Registrar Editorial</button>
+                <button class="actualizar">Actualizar</button>
+                <button class="eliminar">Eliminar</button>
+            </form>
+        </section>
 
-      <section class="lista-editoriales">
-        <h2>Lista de Editoriales</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Dirección</th>
-              <th>Teléfono</th>
-              <th>Correo Electrónico</th>
-              <th>Acciones</th> 
-            </tr>
-          </thead>
-          <tbody id="tablaEditoriales">
-
-          </tbody>
-        </table>
-      </section>
+        <section class="lista-editoriales">
+            <h2>Lista de Editoriales</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>Correo Electrónico</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEditoriales">
+                </tbody>
+            </table>
+        </section>
     </main>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formEditorial = document.getElementById('formEditorial');
+            const tablaEditorialesBody = document.getElementById('tablaEditoriales');
+
+            if (formEditorial) {
+                formEditorial.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const nombreInput = formEditorial.querySelector('input[name="nombre"]');
+                    const direccionInput = formEditorial.querySelector('input[name="direccion"]');
+                    const telefonoInput = formEditorial.querySelector('input[name="telefono"]');
+                    const emailInput = formEditorial.querySelector('input[name="email"]');
+
+                    if (nombreInput && direccionInput && telefonoInput && emailInput) {
+                        const nuevaEditorial = {
+                            nombre: nombreInput.value,
+                            direccion: direccionInput.value,
+                            telefono: telefonoInput.value,
+                            email: emailInput.value,
+                        };
+
+                        try {
+                            const response = await fetch('http://localhost:3300/api/editorial/insertareditoriales', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(nuevaEditorial),
+                            });
+
+                            console.log('Response from register:', response);
+
+                            if (response && response.ok) {
+                                const data = await response.json();
+                                console.log('Editorial registrada exitosamente:', data);
+                                alert('Editorial registrada exitosamente!');
+                                formEditorial.reset();
+                                fetchEditoriales();
+                            } else {
+                                const error = await response.json();
+                                console.error('Error al registrar la editorial:', error);
+                                alert('Error al registrar la editorial.');
+                            }
+                        } catch (error) {
+                            console.error('Error de red:', error);
+                            alert('Error de red al intentar registrar la editorial.');
+                        }
+                    } else {
+                        console.error('Por favor, completa todos los campos requeridos.');
+                        alert('Por favor, completa todos los campos requeridos.');
+                    }
+                });
+            } else {
+                console.error('No se encontró el formulario con el ID "formEditorial".');
+            }
+
+            async function fetchEditoriales() {
+                if (!tablaEditorialesBody) {
+                    console.error('No se encontró el elemento tbody con el ID "tablaEditoriales".');
+                    return;
+                }
+
+                tablaEditorialesBody.innerHTML = '';
+
+                try {
+                    const response = await fetch('http://localhost:3300/api/editorial/listareditoriales');
+                    console.log('Response from list:', response);
+
+                    if (!response.ok) {
+                        const message = `Error al obtener editoriales: ${response.status}`;
+                        throw new Error(message);
+                    }
+                    const editoriales = await response.json();
+                    editoriales.forEach(editorial => {
+                        const row = tablaEditorialesBody.insertRow();
+
+                        const idCell = row.insertCell();
+                        idCell.textContent = editorial.editorial_id;
+
+                        const nombreCell = row.insertCell();
+                        nombreCell.textContent = editorial.nombre;
+
+                        const direccionCell = row.insertCell();
+                        direccionCell.textContent = editorial.direccion;
+
+                        const telefonoCell = row.insertCell();
+                        telefonoCell.textContent = editorial.telefono;
+
+                        const emailCell = row.insertCell();
+                        emailCell.textContent = editorial.email;
+
+                        const eliminarCell = row.insertCell();
+                        const eliminarButton = document.createElement('button');
+                        eliminarButton.textContent = 'Eliminar';
+                        eliminarButton.classList.add('eliminar-btn'); 
+                        eliminarButton.dataset.editorialId = editorial.editorial_id; 
+                        eliminarButton.addEventListener('click', () => eliminarEditorial(editorial.editorial_id));
+                        eliminarCell.appendChild(eliminarButton);
+                    });
+
+                } catch (error) {
+                    console.error('Error al cargar la lista de editoriales:', error);
+                    alert('Error al cargar la lista de editoriales.');
+                }
+            }
+
+            async function eliminarEditorial(id) {
+                if (confirm(`¿Estás seguro de que quieres eliminar la editorial con ID ${id}?`)) {
+                    try {
+                        const response = await fetch(`http://localhost:3300/api/editorial/eliminareditorial/${id}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            console.log(`Editorial con ID ${id} eliminada exitosamente.`);
+                            alert(`Editorial con ID ${id} eliminada exitosamente.`);
+                            fetchEditoriales(); 
+                        } else {
+                            const error = await response.json();
+                            console.error(`Error al eliminar la editorial con ID ${id}:`, error);
+                            alert(`Error al eliminar la editorial con ID ${id}.`);
+                        }
+                    } catch (error) {
+                        console.error('Error de red al intentar eliminar la editorial:', error);
+                        alert('Error de red al intentar eliminar la editorial.');
+                    }
+                }
+            }
+
+            fetchEditoriales();
+        });
+    </script>
+</body>
 </html>

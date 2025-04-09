@@ -1,49 +1,186 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Autores</title>
     <link rel="stylesheet" href="src/css/autores.css" />
-  </head>
-  <body>
+</head>
+<body>
     <header>
-      <h1>Gestión de Autores</h1>
-      <a href="inicio.html" class="volver">← Volver al inicio</a>
+        <h1>Gestión de Autores</h1>
+        <a href="inicio.html" class="volver">← Volver al inicio</a>
     </header>
 
     <main>
-      <section class="formulario">
-        <h2>Registrar Nuevo Autor</h2>
-        <form id="formAutor">
-          <input type="text" placeholder="Nombre del autor" name="nombre" required />
-          <input type="text" placeholder="Nacionalidad" name="nacionalidad" required />
-          <label>Fecha de nacimiento:</label>
-          <input type="date" name="fecha_nacimiento" required />
-          <label>Fecha de fallecimiento (opcional):</label>
-          <input type="date" name="fecha_fallecimiento" />
-          <button type="submit">Registrar Autor</button>
-          <button class="actualizar">Actualizar</button>
-          <button class="eliminar">Eliminar</button>
-        </form>
-      </section>
+        <section class="formulario">
+            <h2>Registrar Nuevo Autor</h2>
+            <form id="formAutor">
+                <input type="text" placeholder="Nombre del autor" name="nombre" required />
+                <input type="text" placeholder="Nacionalidad" name="nacionalidad" required />
+                <label>Fecha de nacimiento:</label>
+                <input type="date" name="fecha_nacimiento" required />
+                <label>Fecha de fallecimiento (opcional):</label>
+                <input type="date" name="fecha_fallecimiento" />
+                <button type="submit">Registrar Autor</button>
+                <button class="actualizar">Actualizar</button>
+                <button class="eliminar">Eliminar</button>
+            </form>
+        </section>
 
-      <section class="lista-autores">
-        <h2>Lista de Autores</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th>Nacionalidad</th>
-              <th>Fecha Nacimiento</th>
-              <th>Fecha Fallecimiento</th>
-            </tr>
-          </thead>
-          <tbody id="tablaAutores">
-          </tbody>
-        </table>
-      </section>
+        <section class="lista-autores">
+            <h2>Lista de Autores</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Nacionalidad</th>
+                        <th>Fecha Nacimiento</th>
+                        <th>Fecha Fallecimiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaAutores">
+                </tbody>
+            </table>
+        </section>
     </main>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formAutor = document.getElementById('formAutor');
+            const tablaAutoresBody = document.getElementById('tablaAutores');
+
+            if (formAutor) {
+                formAutor.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const nombreInput = formAutor.querySelector('input[name="nombre"]');
+                    const nacionalidadInput = formAutor.querySelector('input[name="nacionalidad"]');
+                    const fechaNacimientoInput = formAutor.querySelector('input[name="fecha_nacimiento"]');
+                    const fechaFallecimientoInput = formAutor.querySelector('input[name="fecha_fallecimiento"]');
+
+                    if (nombreInput && nacionalidadInput && fechaNacimientoInput) {
+                        const nuevoAutor = {
+                            nombre: nombreInput.value,
+                            nacionalidad: nacionalidadInput.value,
+                            fch_nacimiento: fechaNacimientoInput.value,
+                            fch_fallecimiento: fechaFallecimientoInput?.value || null,
+                        };
+
+                        try {
+                            const response = await fetch('http://localhost:3300/api/autores/insertarautores', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(nuevoAutor),
+                            });
+
+                            console.log('Response from register:', response);
+
+                            if (response && response.ok) {
+                                const data = await response.json();
+                                console.log('Autor registrado exitosamente:', data);
+                                alert('Autor registrado exitosamente!');
+                                formAutor.reset();
+                                fetchAutores();
+                            } else {
+                                const error = await response.json();
+                                console.error('Error al registrar el autor:', error);
+                                alert('Error al registrar el autor.');
+                            }
+                        } catch (error) {
+                            console.error('Error de red:', error);
+                            alert('Error de red al intentar registrar el autor.');
+                        }
+                    } else {
+                        console.error('No se encontraron todos los campos requeridos del formulario.');
+                        alert('Por favor, completa todos los campos requeridos.');
+                    }
+                });
+            } else {
+                console.error('No se encontró el formulario con el ID "formAutor".');
+            }
+
+            async function fetchAutores() {
+                if (!tablaAutoresBody) {
+                    console.error('No se encontró el elemento tbody con el ID "tablaAutores".');
+                    return;
+                }
+
+                tablaAutoresBody.innerHTML = '';
+
+                try {
+                    const response = await fetch('http://localhost:3300/api/autores/listarautores');
+                    console.log('Response from list:', response);
+
+                    if (!response.ok) {
+                        const message = `Error al obtener autores: ${response.status}`;
+                        throw new Error(message);
+                    }
+                    const autores = await response.json();
+                    autores.forEach(autor => {
+                        const row = tablaAutoresBody.insertRow();
+
+                        const idCell = row.insertCell();
+                        idCell.textContent = autor.autor_id;
+
+                        const nombreCell = row.insertCell();
+                        nombreCell.textContent = autor.nombre;
+
+                        const nacionalidadCell = row.insertCell();
+                        nacionalidadCell.textContent = autor.nacionalidad;
+
+                        const fechaNacimientoCell = row.insertCell();
+                        fechaNacimientoCell.textContent = new Date(autor.fecha_nacimiento).toLocaleDateString();
+
+                        const fechaFallecimientoCell = row.insertCell();
+                        fechaFallecimientoCell.textContent = autor.fecha_fallecimiento ? new Date(autor.fecha_fallecimiento).toLocaleDateString() : '';
+
+                        // *** INICIO: Agregar botón de eliminar ***
+                        const eliminarCell = row.insertCell();
+                        const eliminarButton = document.createElement('button');
+                        eliminarButton.textContent = 'Eliminar';
+                        eliminarButton.classList.add('eliminar-btn'); // Opcional: agregar una clase para estilos
+                        eliminarButton.dataset.autorId = autor.autor_id; // Almacenar el ID del autor
+                        eliminarButton.addEventListener('click', () => eliminarAutor(autor.autor_id));
+                        eliminarCell.appendChild(eliminarButton);
+                        // *** FIN: Agregar botón de eliminar ***
+                    });
+
+                } catch (error) {
+                    console.error('Error al cargar la lista de autores:', error);
+                    alert('Error al cargar la lista de autores.');
+                }
+            }
+
+            async function eliminarAutor(id) {
+                if (confirm(`¿Estás seguro de que quieres eliminar al autor con ID ${id}?`)) {
+                    try {
+                        const response = await fetch(`http://localhost:3300/api/autores/eliminarautores/${id}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            console.log(`Autor con ID ${id} eliminado exitosamente.`);
+                            alert(`Autor con ID ${id} eliminado exitosamente.`);
+                            fetchAutores(); 
+                        } else {
+                            const error = await response.json();
+                            console.error(`Error al eliminar el autor con ID ${id}:`, error);
+                            alert(`Error al eliminar el autor con ID ${id}.`);
+                        }
+                    } catch (error) {
+                        console.error('Error de red al intentar eliminar el autor:', error);
+                        alert('Error de red al intentar eliminar el autor.');
+                    }
+                }
+            }
+
+            fetchAutores();
+        });
+    </script>
+</body>
 </html>

@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Autor registrado exitosamente:', data);
             alert('Autor registrado exitosamente!');
             formAutor.reset();
-            fetchAutores(); 
+            //fetchAutores(); 
           } else {
             const error: any = await response.json();
             console.error('Error al registrar el autor:', error);

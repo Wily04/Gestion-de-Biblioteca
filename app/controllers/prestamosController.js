@@ -1,8 +1,15 @@
-const Prestamo = require('../models/prestamosModel');
+const { Prestamo } = require('../models/prestamosModel');
+const { Usuario } = require('../models/usuariosModel'); 
+const { Libro } = require('../models/librosModel');   
 
 const obtenerPrestamos = async (req, res) => {
     try {
-        const prestamos = await Prestamo.findAll();
+        const prestamos = await Prestamo.findAll({
+            include: [
+                { model: Usuario, as: 'usuario', attributes: ['nombre'] }, 
+                { model: Libro, as: 'libro', attributes: ['titulo'] }     
+            ]
+        });
         res.json(prestamos);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -12,7 +19,12 @@ const obtenerPrestamos = async (req, res) => {
 const obtenerPrestamosPorID = async (req, res) => {
     const { id } = req.params;
     try {
-        const prestamo = await Prestamo.findByPk(id);
+        const prestamo = await Prestamo.findByPk(id, {
+            include: [
+                { model: Usuario, as: 'usuario', attributes: ['nombre'] },
+                { model: Libro, as: 'libro', attributes: ['titulo'] }
+            ]
+        });
         if (!prestamo) {
             return res.status(404).json({ message: 'Préstamo no encontrado' });
         }
@@ -37,12 +49,12 @@ const crearPrestamo = async (req, res) => {
             estado
         });
 
-        
+
         console.log('Préstamo guardado en la base de datos:', nuevoPrestamo);
         res.status(201).json(nuevoPrestamo);
     } catch (error) {
         console.error('Error al crear el préstamo:', error);
-        
+
         res.status(500).json({ error: 'Error al crear el préstamo', details: error.message });
     }
 };
@@ -55,13 +67,13 @@ const actualizarPrestamo = async (req, res) => {
         if (!prestamo) {
             return res.status(404).json({ message: 'Préstamo no encontrado' });
         }
-        await prestamo.update({ 
-            usuario_id, 
-            libro_id, 
-            fecha_prestamo, 
-            fecha_vencimiento, 
-            fecha_devolucion, 
-            estado 
+        await prestamo.update({
+            usuario_id,
+            libro_id,
+            fecha_prestamo,
+            fecha_vencimiento,
+            fecha_devolucion,
+            estado
         });
         res.json({ message: 'Préstamo actualizado exitosamente' });
     } catch (err) {

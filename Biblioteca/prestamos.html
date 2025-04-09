@@ -1,59 +1,253 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Préstamos</title>
     <link rel="stylesheet" href="src/css/prestamos.css" />
-  </head>
-  <body>
+</head>
+<body>
     <header>
-      <h1>Gestión de Préstamos</h1>
-      <a href="inicio.html" class="volver">← Volver al inicio</a>
+        <h1>Gestión de Préstamos</h1>
+        <a href="inicio.html" class="volver">← Volver al inicio</a>
     </header>
 
     <main>
-      <section class="formulario">
-        <h2>Registrar Nuevo Préstamo</h2>
-        <form id="formPrestamo">
-          <label for="usuario_id">ID de Usuario:</label>
-          <input type="number" name="usuario_id" required />
-          <label for="libro_id">ID de Libro:</label>
-          <input type="number" name="libro_id" required />
-          <label for="fecha_prestamo">Fecha de Préstamo:</label>
-          <input type="date" name="fecha_prestamo" required />
-          <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
-          <input type="date" name="fecha_vencimiento" required />
-          <label for="estado">Estado:</label>
-          <select name="estado" required>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Devuelto">Devuelto</option>
-            <option value="Vencido">Vencido</option>
-          </select>
-          <button type="submit">Registrar Préstamo</button>
-          <button class="actualizar">Actualizar</button>
-          <button class="eliminar">Eliminar</button>
-        </form>
-      </section>
+        <section class="formulario">
+            <h2>Registrar Nuevo Préstamo</h2>
+            <form id="formPrestamo">
+                <label for="usuario_id">ID de Usuario:</label>
+                <select name="usuario_id" id="usuario_id" required>
+                    <option value="">Seleccionar Usuario</option>
+                </select>
 
-      <section class="lista-prestamos">
-        <h2>Lista de Préstamos</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID Préstamo</th>
-              <th>ID Usuario</th>
-              <th>ID Libro</th>
-              <th>Fecha Préstamo</th>
-              <th>Fecha Vencimiento</th>
-              <th>Fecha Devolución</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="tablaPrestamos">
-          </tbody>
-        </table>
-      </section>
+                <label for="libro_id">ID de Libro:</label>
+                <select name="libro_id" id="libro_id" required>
+                    <option value="">Seleccionar Libro</option>
+                </select>
+
+                <label for="fecha_prestamo">Fecha de Préstamo:</label>
+                <input type="date" name="fecha_prestamo" required />
+                <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+                <input type="date" name="fecha_vencimiento" required />
+                <label for="estado">Estado:</label>
+                <select name="estado" id="estado" required>
+                    <option value="">Seleccionar Estado</option>
+                    <option value="activo">Activo</option>
+                    <option value="finalizado">Finalizado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+                <button type="submit">Registrar Préstamo</button>
+                <button class="actualizar">Actualizar</button>
+                <button class="eliminar">Eliminar</button>
+            </form>
+        </section>
+
+        <section class="lista-prestamos">
+            <h2>Lista de Préstamos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Préstamo</th>
+                        <th>ID Usuario</th>
+                        <th>Título Libro</th>
+                        <th>Nombre Usuario</th>
+                        <th>Fecha Préstamo</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Fecha Devolución</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaPrestamos">
+                </tbody>
+            </table>
+        </section>
     </main>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formPrestamo = document.getElementById('formPrestamo');
+            const tablaPrestamosBody = document.getElementById('tablaPrestamos');
+            const usuarioSelect = document.getElementById('usuario_id');
+            const libroSelect = document.getElementById('libro_id');
+            const estadoSelect = document.getElementById('estado');
+
+            async function cargarUsuarios() {
+                try {
+                    const response = await fetch('http://localhost:3300/api/usuarios/listarusuarios');
+                    if (response.ok) {
+                        const usuarios = await response.json();
+                        usuarios.forEach(usuario => {
+                            const option = document.createElement('option');
+                            option.value = usuario.usuario_id;
+                            option.textContent = usuario.nombre;
+                            usuarioSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Error al cargar usuarios:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar usuarios:', error);
+                }
+            }
+
+            async function cargarLibros() {
+                try {
+                    const response = await fetch('http://localhost:3300/api/libros/listarlibros');
+                    if (response.ok) {
+                        const libros = await response.json();
+                        libros.forEach(libro => {
+                            const option = document.createElement('option');
+                            option.value = libro.libro_id;
+                            option.textContent = libro.titulo;
+                            libroSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Error al cargar libros:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar libros:', error);
+                }
+            }
+
+            if (formPrestamo) {
+                formPrestamo.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    if (!usuarioSelect.value || !libroSelect.value || !estadoSelect.value) {
+                        alert('Por favor, selecciona un usuario, un libro y un estado.');
+                        return;
+                    }
+
+                    const nuevoPrestamo = {
+                        usuario_id: parseInt(usuarioSelect.value),
+                        libro_id: parseInt(libroSelect.value),
+                        fecha_prestamo: formPrestamo.querySelector('input[name="fecha_prestamo"]').value,
+                        fecha_vencimiento: formPrestamo.querySelector('input[name="fecha_vencimiento"]').value,
+                        estado: estadoSelect.value,
+                    };
+
+                    try {
+                        const response = await fetch('http://localhost:3300/api/prestamo/crearprestamos', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(nuevoPrestamo),
+                        });
+
+                        console.log('Response from register:', response);
+
+                        if (response && response.ok) {
+                            const data = await response.json();
+                            console.log('Préstamo registrado exitosamente:', data);
+                            alert('Préstamo registrado exitosamente!');
+                            formPrestamo.reset();
+                            fetchPrestamos();
+                        } else {
+                            const error = await response.json();
+                            console.error('Error al registrar el préstamo:', error);
+                            alert('Error al registrar el préstamo.');
+                        }
+                    } catch (error) {
+                        console.error('Error de red:', error);
+                        alert('Error de red al intentar registrar el préstamo.');
+                    }
+                });
+            } else {
+                console.error('No se encontró el formulario con el ID "formPrestamo".');
+            }
+
+            async function fetchPrestamos() {
+                if (!tablaPrestamosBody) {
+                    console.error('No se encontró el elemento tbody con el ID "tablaPrestamos".');
+                    return;
+                }
+
+                tablaPrestamosBody.innerHTML = '';
+
+                try {
+                    const response = await fetch('http://localhost:3300/api/prestamo/mostrsrprestamos');
+                    console.log('Response from list:', response);
+
+                    if (!response.ok) {
+                        const message = `Error al obtener préstamos: ${response.status}`;
+                        throw new Error(message);
+                    }
+                    const prestamos = await response.json();
+                    prestamos.forEach(prestamo => {
+                        const row = tablaPrestamosBody.insertRow();
+
+                        const idCell = row.insertCell();
+                        idCell.textContent = prestamo.prestamos_id;
+
+                        const usuarioIdCell = row.insertCell();
+                        usuarioIdCell.textContent = prestamo.usuario_id;
+
+                        const libroIdCell = row.insertCell();
+                        libroIdCell.textContent = prestamo.libro_id;
+
+                        const tituloLibroCell = row.insertCell();
+                        tituloLibroCell.textContent = prestamo.titulo_libro || 'N/A'; 
+
+                        const nombreUsuarioCell = row.insertCell();
+                        nombreUsuarioCell.textContent = prestamo.nombre_usuario || 'N/A'; 
+
+                        const fechaPrestamoCell = row.insertCell();
+                        fechaPrestamoCell.textContent = new Date(prestamo.fecha_prestamo).toLocaleDateString();
+
+                        const fechaVencimientoCell = row.insertCell();
+                        fechaVencimientoCell.textContent = new Date(prestamo.fecha_vencimiento).toLocaleDateString();
+
+                        const fechaDevolucionCell = row.insertCell();
+                        fechaDevolucionCell.textContent = prestamo.fecha_devolucion ? new Date(prestamo.fecha_devolucion).toLocaleDateString() : '-';
+
+                        const estadoCell = row.insertCell();
+                        estadoCell.textContent = prestamo.estado;
+
+                        const accionesCell = row.insertCell();
+                        const eliminarButton = document.createElement('button');
+                        eliminarButton.textContent = 'Eliminar';
+                        eliminarButton.classList.add('eliminar-btn');
+                        eliminarButton.dataset.prestamoId = prestamo.prestamos_id;
+                        eliminarButton.addEventListener('click', () => eliminarPrestamo(prestamo.prestamos_id));
+                        accionesCell.appendChild(eliminarButton);
+                    });
+
+                } catch (error) {
+                    console.error('Error al cargar la lista de préstamos:', error);
+                    alert('Error al cargar la lista de préstamos.');
+                }
+            }
+
+            async function eliminarPrestamo(id) {
+                if (confirm(`¿Estás seguro de que quieres eliminar el préstamo con ID ${id}?`)) {
+                    try {
+                        const response = await fetch(`http://localhost:3300/api/prestamo/borrarprestamos/${id}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            console.log(`Préstamo con ID ${id} eliminado exitosamente.`);
+                            alert(`Préstamo con ID ${id} eliminado exitosamente.`);
+                            fetchPrestamos();
+                        } else {
+                            const error = await response.json();
+                            console.error(`Error al eliminar el préstamo con ID ${id}:`, error);
+                            alert(`Error al eliminar el préstamo con ID ${id}.`);
+                        }
+                    } catch (error) {
+                        console.error('Error de red al intentar eliminar el préstamo:', error);
+                        alert('Error de red al intentar eliminar el préstamo.');
+                    }
+                }
+            }
+
+            cargarUsuarios();
+            cargarLibros();
+            fetchPrestamos();
+        });
+    </script>
+</body>
 </html>

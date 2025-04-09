@@ -40,7 +40,6 @@ async function getAutor(req, res) {
 const eliminarAutor = async (req, res) => {
     const { id } = req.params;
     try {
-        // Si tu clave primaria no es "id", usa findOne con where
         const autor = await Autor.findOne({ where: { autor_id: id } });
 
         if (!autor) {

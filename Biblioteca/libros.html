@@ -1,54 +1,253 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestión de Libros</title>
     <link rel="stylesheet" href="src/css/libros.css" />
-  </head>
-  <body>
+</head>
+<body>
     <header>
-      <h1>Gestión de Libros</h1>
-      <a href="inicio.html" class="volver">← Volver al inicio</a>
+        <h1>Gestión de Libros</h1>
+        <a href="inicio.html" class="volver">← Volver al inicio</a>
     </header>
 
     <main>
-      <section class="formulario">
-        <h2>Registrar Nuevo Libro</h2>
-        <form id="formLibro">
-          <input type="text" placeholder="Título del libro" name="titulo" required />
-          <input type="text" placeholder="Autor" name="autor" required />
-          <input type="text" placeholder="Editorial" name="editorial" required />
-          <input type="text" placeholder="Género" name="genero" required />
-          <label>Fecha de publicación:</label>
-          <input type="date" name="fecha_publicacion" required />
-          <input type="number" placeholder="Copias disponibles" name="copias_disponibles" required min="0" />
-          <input type="number" placeholder="Copias totales" name="copias_totales" required min="1" />
-          <button type="submit">Registrar Libro</button>
-          <button class="actualizar">Actualizar</button>
-          <button class="eliminar">Eliminar</button>
-        </form>
-      </section>
+        <section class="formulario">
+            <h2>Registrar Nuevo Libro</h2>
+            <form id="formLibro">
+                <input type="text" placeholder="Título del libro" name="titulo" required />
 
-      <section class="lista-libros">
-        <h2>Lista de Libros</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Título</th>
-              <th>Autor</th>
-              <th>Editorial</th>
-              <th>Género</th>
-              <th>Fecha de Publicación</th>
-              <th>Copias Disponibles</th>
-              <th>Copias Totales</th>
-            </tr>
-          </thead>
-          <tbody id="tablaLibros">
-          </tbody>
-        </table>
-      </section>
+                <label for="autor_id">Autor:</label>
+                <select name="autor_id" id="autor_id" required>
+                    <option value="">Seleccionar Autor</option>
+                </select>
+
+                <label for="editorial_id">Editorial:</label>
+                <select name="editorial_id" id="editorial_id" required>
+                    <option value="">Seleccionar Editorial</option>
+                </select>
+
+                <input type="text" placeholder="Género" name="genero" required />
+                <label>Fecha de publicación:</label>
+                <input type="date" name="fecha_publicacion" required />
+                <input type="number" placeholder="Copias disponibles" name="copias_disponibles" required min="0" />
+                <input type="number" placeholder="Copias totales" name="copias_totales" required min="1" />
+                <button type="submit">Registrar Libro</button>
+                <button class="actualizar">Actualizar</button>
+                <button class="eliminar">Eliminar</button>
+            </form>
+        </section>
+
+        <section class="lista-libros">
+            <h2>Lista de Libros</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Editorial</th>
+                        <th>Género</th>
+                        <th>Fecha de Publicación</th>
+                        <th>Copias Disponibles</th>
+                        <th>Copias Totales</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaLibros">
+                </tbody>
+            </table>
+        </section>
     </main>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formLibro = document.getElementById('formLibro');
+            const tablaLibrosBody = document.getElementById('tablaLibros');
+            const autorSelect = document.getElementById('autor_id');
+            const editorialSelect = document.getElementById('editorial_id');
+
+            async function cargarAutores() {
+                try {
+                    const response = await fetch('http://localhost:3300/api/autores/listarautores');
+                    if (response.ok) {
+                        const autores = await response.json();
+                        autores.forEach(autor => {
+                            const option = document.createElement('option');
+                            option.value = autor.autor_id;
+                            option.textContent = autor.nombre;
+                            autorSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Error al cargar autores:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar autores:', error);
+                }
+            }
+
+            async function cargarEditoriales() {
+                try {
+                    const response = await fetch('http://localhost:3300/api/editorial/listareditoriales');
+                    if (response.ok) {
+                        const editoriales = await response.json();
+                        editoriales.forEach(editorial => {
+                            const option = document.createElement('option');
+                            option.value = editorial.editorial_id;
+                            option.textContent = editorial.nombre;
+                            editorialSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Error al cargar editoriales:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error de red al cargar editoriales:', error);
+                }
+            }
+
+            if (formLibro) {
+                formLibro.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const tituloInput = formLibro.querySelector('input[name="titulo"]');
+                    const generoInput = formLibro.querySelector('input[name="genero"]');
+                    const fechaPublicacionInput = formLibro.querySelector('input[name="fecha_publicacion"]');
+                    const copiasDisponiblesInput = formLibro.querySelector('input[name="copias_disponibles"]');
+                    const copiasTotalesInput = formLibro.querySelector('input[name="copias_totales"]');
+
+                    if (tituloInput && autorSelect.value && editorialSelect.value && generoInput && fechaPublicacionInput && copiasDisponiblesInput && copiasTotalesInput) {
+                        const nuevoLibro = {
+                            titulo: tituloInput.value,
+                            autor_id: parseInt(autorSelect.value),
+                            editorial_id: parseInt(editorialSelect.value),
+                            genero: generoInput.value,
+                            fecha_publicacion: fechaPublicacionInput.value,
+                            copias_disponibles: parseInt(copiasDisponiblesInput.value),
+                            copias_totales: parseInt(copiasTotalesInput.value),
+                        };
+
+                        try {
+                            const response = await fetch('http://localhost:3300/api/libros/insertarlibros', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(nuevoLibro),
+                            });
+
+                            console.log('Response from register:', response);
+
+                            if (response && response.ok) {
+                                const data = await response.json();
+                                console.log('Libro registrado exitosamente:', data);
+                                alert('Libro registrado exitosamente!');
+                                formLibro.reset();
+                                fetchLibros();
+                            } else {
+                                const error = await response.json();
+                                console.error('Error al registrar el libro:', error);
+                                alert('Error al registrar el libro.');
+                            }
+                        } catch (error) {
+                            console.error('Error de red:', error);
+                            alert('Error de red al intentar registrar el libro.');
+                        }
+                    } else {
+                        console.error('Por favor, selecciona un autor y una editorial.');
+                        alert('Por favor, selecciona un autor y una editorial.');
+                    }
+                });
+            } else {
+                console.error('No se encontró el formulario con el ID "formLibro".');
+            }
+
+            async function fetchLibros() {
+                if (!tablaLibrosBody) {
+                    console.error('No se encontró el elemento tbody con el ID "tablaLibros".');
+                    return;
+                }
+
+                tablaLibrosBody.innerHTML = '';
+
+                try {
+                    const response = await fetch('http://localhost:3300/api/libros/listarlibros');
+                    console.log('Response from list:', response);
+
+                    if (!response.ok) {
+                        const message = `Error al obtener libros: ${response.status}`;
+                        throw new Error(message);
+                    }
+                    const libros = await response.json();
+                    libros.forEach(libro => {
+                        const row = tablaLibrosBody.insertRow();
+
+                        const idCell = row.insertCell();
+                        idCell.textContent = libro.libro_id;
+
+                        const tituloCell = row.insertCell();
+                        tituloCell.textContent = libro.titulo;
+
+                        const autorCell = row.insertCell();
+                        autorCell.textContent = libro.autor_id; 
+
+                        const editorialCell = row.insertCell();
+                        editorialCell.textContent = libro.editorial_id; 
+
+                        const generoCell = row.insertCell();
+                        generoCell.textContent = libro.genero;
+
+                        const fechaPublicacionCell = row.insertCell();
+                        fechaPublicacionCell.textContent = new Date(libro.fecha_publicacion).toLocaleDateString();
+
+                        const copiasDisponiblesCell = row.insertCell();
+                        copiasDisponiblesCell.textContent = libro.copias_disponibles;
+
+                        const copiasTotalesCell = row.insertCell();
+                        copiasTotalesCell.textContent = libro.copias_totales;
+
+                        const eliminarCell = row.insertCell();
+                        const eliminarButton = document.createElement('button');
+                        eliminarButton.textContent = 'Eliminar';
+                        eliminarButton.classList.add('eliminar-btn');
+                        eliminarButton.dataset.libroId = libro.libro_id;
+                        eliminarButton.addEventListener('click', () => eliminarLibro(libro.libro_id));
+                        eliminarCell.appendChild(eliminarButton);
+                    });
+
+                } catch (error) {
+                    console.error('Error al cargar la lista de libros:', error);
+                    alert('Error al cargar la lista de libros.');
+                }
+            }
+
+            async function eliminarLibro(id) {
+                if (confirm(`¿Estás seguro de que quieres eliminar el libro con ID ${id}?`)) {
+                    try {
+                        const response = await fetch(`http://localhost:3300/api/libros/eliminarlibro/${id}`, {
+                            method: 'DELETE',
+                        });
+
+                        if (response.ok) {
+                            console.log(`Libro con ID ${id} eliminado exitosamente.`);
+                            alert(`Libro con ID ${id} eliminado exitosamente.`);
+                            fetchLibros();
+                        } else {
+                            const error = await response.json();
+                            console.error(`Error al eliminar el libro con ID ${id}:`, error);
+                            alert(`Error al eliminar el libro con ID ${id}.`);
+                        }
+                    } catch (error) {
+                        console.error('Error de red al intentar eliminar el libro:', error);
+                        alert('Error de red al intentar eliminar el libro.');
+                    }
+                }
+            }
+
+            cargarAutores();
+            cargarEditoriales();
+            fetchLibros();
+        });
+    </script>
+</body>
 </html>

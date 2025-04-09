@@ -10,10 +10,9 @@ const {
 } = require('../controllers/prestamosController');
 
 
-router.get('/prestamos', obtenerPrestamos);
-router.get('/prestamos/:id', obtenerPrestamosPorID);
-router.post('/prestamos', crearPrestamo);
-router.put('/prestamos/:id', actualizarPrestamo); 
-router.delete('/prestamos/:id', eliminarPrestamo); 
+router.get('/mostrarprestamos', obtenerPrestamos);
+router.post('/crearprestamos', crearPrestamo);
+router.put('/actualizarprestamos/:id', actualizarPrestamo); 
+router.delete('/borrarprestamos/:id', eliminarPrestamo); 
 
 module.exports = router;
