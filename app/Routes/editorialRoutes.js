@@ -5,7 +5,7 @@ const editorialesController = require('../controllers/editarialesController');
 const apiRoutes = express.Router();
 
 apiRoutes
-    .get('/getAllEditoriales', async (req, res) => await editorialesController.getEditoriales(req, res))
-    .post('/insertEditorial', async (req, res) => await editorialesController.insertEditorial(req, res));
+    .get('/listareditoriales', async (req, res) => await editorialesController.getEditoriales(req, res))
+    .post('/insertareditoriales', async (req, res) => await editorialesController.insertEditorial(req, res));
 
 module.exports = apiRoutes;

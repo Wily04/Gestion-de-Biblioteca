@@ -5,7 +5,7 @@ const librosController = require('../controllers/librosController');
 const apiRoutes = express.Router();
 
 apiRoutes
-    .get('/getAllLibros', async (req, res) => await librosController.getLibros(req, res))
-    .post('/insertLibro', async (req, res) => await librosController.insertLibro(req, res));
+    .get('/listarlibros', async (req, res) => await librosController.getLibros(req, res))
+    .post('/insertarlibros', async (req, res) => await librosController.insertLibro(req, res));
 
 module.exports = apiRoutes;
