@@ -19,9 +19,14 @@ module.exports = (sequelize) =>{
     }
   },
   nacionalidad: {
-    type: DataTypes.TEXT,
+    type: DataTypes.STRING,
     allowNull: false,
     unique: true,
+    validate: {
+      notEmpty: true,
+      len: [3, 100],
+    }
+    
   },
   fecha_nacimiento: {
     type: DataTypes.DATE,

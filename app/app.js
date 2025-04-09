@@ -1,10 +1,16 @@
 const express = require('express');
-const App=express();
+const cors = require('cors');
+
+const App = express();
+
 const autorRoutes = require('./Routes/AutorRoutes');
+const usuarioRoutes = require('./Routes/usuarioRoutes');
 
 App.use(express.json());
 App.use(express.urlencoded({extended:false}));
+App.use(cors());
 
-App.use('/', autorRoutes);
+App.use('/autores', autorRoutes);
+App.use('/usuarios', usuarioRoutes);
 
 module.exports=App;
