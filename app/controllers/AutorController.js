@@ -8,8 +8,7 @@ function insertAutor(req, res) {
         nombre: req.body['nombre'],
         nacionalidad: req.body['nacionalidad'],
         fecha_nacimiento: req.body['fch_nacimiento'],
-        fecha_fallecimiento: req.body['fch_fallecimiento'] || null,
-        
+        fecha_fallecimiento: req.body['fch_fallecimiento'] || null
     })
         .then(data => {
             res.status(200).send(data)
