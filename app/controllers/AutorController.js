@@ -24,16 +24,18 @@ function insertAutor(req, res) {
 async function getAutor(req, res) {
     Autor.findAll()
         .then(data => {
-            if (!data) { res.status(404).send({ message: 'No se encontraron Autores' }) }
-            else {
+            console.log('Datos obtenidos de la base de datos:', data); 
+            if (!data) {
+                res.status(404).send({ message: 'No se encontraron Autores' });
+            } else {
                 res.status(200).send(data);
             }
         })
         .catch(err => {
             res.status(500).send({
                 message: err.message || "Sucedio un error al obtener los registros de Autor"
-            })
-        })
+            });
+        });
 }
 
 const eliminarAutor = async (req, res) => {
