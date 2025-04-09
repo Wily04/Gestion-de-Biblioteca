@@ -168,7 +168,8 @@
                 tablaPrestamosBody.innerHTML = '';
 
                 try {
-                    const response = await fetch('http://localhost:3300/api/prestamo/mostrsrprestamos');
+                    // **MODIFICACIÓN IMPORTANTE: Utiliza la nueva ruta "/mostrarprestamos"**
+                    const response = await fetch('http://localhost:3300/api/prestamo/mostrarprestamos');
                     console.log('Response from list:', response);
 
                     if (!response.ok) {
@@ -188,11 +189,12 @@
                         const libroIdCell = row.insertCell();
                         libroIdCell.textContent = prestamo.libro_id;
 
+                        // **MODIFICACIÓN: Accede a las propiedades anidadas "libro" y "usuario"**
                         const tituloLibroCell = row.insertCell();
-                        tituloLibroCell.textContent = prestamo.titulo_libro || 'N/A'; 
+                        tituloLibroCell.textContent = prestamo.libro ? prestamo.libro.titulo : 'N/A';
 
                         const nombreUsuarioCell = row.insertCell();
-                        nombreUsuarioCell.textContent = prestamo.nombre_usuario || 'N/A'; 
+                        nombreUsuarioCell.textContent = prestamo.usuario ? prestamo.usuario.nombre : 'N/A';
 
                         const fechaPrestamoCell = row.insertCell();
                         fechaPrestamoCell.textContent = new Date(prestamo.fecha_prestamo).toLocaleDateString();
