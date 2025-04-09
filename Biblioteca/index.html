@@ -1,19 +1,60 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Biblioteca</title>
     <link rel="stylesheet" href="src/css/style.css" />
-  </head>
-  <body>
+</head>
+<body>
     <div class="login-container">
-      <h2>Iniciar Sesión</h2>
-      <form>
-        <input type="text" placeholder="Nombre" required />
-        <input type="password" placeholder="Contraseña" required />
-        <button type="submit" href="inicio.html">Entrar</button>
-      </form>
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="contraseña" placeholder="Contraseña" required />
+            <button type="submit">Entrar</button>
+        </form>
     </div>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const email = document.getElementById('email').value;
+                const contraseña = document.getElementById('contraseña').value;
+
+                try {
+                    const response = await fetch('http://localhost:3300/api/usuarios/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email, contraseña: contraseña }), // Cambiado 'nombre' a 'email'
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        console.log('Inicio de sesión exitoso:', data);
+                        alert(data.message || 'Inicio de sesión exitoso!');
+                        window.location.href = 'inicio.html';
+                        if (data.token) {
+                            localStorage.setItem('authToken', data.token);
+                        }
+                    } else {
+                        console.error('Error al iniciar sesión:', data);
+                        alert(data.message || 'Error al iniciar sesión. Credenciales incorrectas.');
+                    }
+
+                } catch (error) {
+                    console.error('Error de red:', error);
+                    alert('Error de red al intentar iniciar sesión.');
+                }
+            });
+        });
+    </script>
+</body>
 </html>
